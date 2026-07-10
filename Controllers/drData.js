@@ -54,14 +54,34 @@ const drdata = async (req,res) =>{
 
 const getDoctorData = async (req,res)=>{
    try {
-    const dr= await DrProfialInfoData.find();
-    res.status(200).json(dr);
-   } catch (error) {
-        console.log(error);
-        res.json(
-            {error:error}
-        )
-   }
+  const limit = 10;
+  const {cursor , search , location , id, gender} = req.query;
+  const filter = {};
+  if(cursor) filter._id = {$gt:cursor};
+  if(id) filter.id = id;
+  if(location) filter.address = {$regex: location , $options: "i"};
+  if(gender) filter.gender ={$regex: `^${gender}$`,$options:"i"}
+  if(search){
+    filter.$or =[
+      {fullname:{$regex:search , $options:"i"}},
+      {specialization:{$regex:search, $options:"i"}}
+    ];
+  }
+  const doctors = await DrProfialInfoData.find(filter).sort({_id:1}).limit(limit);
+  const nextCursor = doctors.length > 0 ? doctors[doctors.length-1]._id:null;
+
+
+  res.status(200).json({
+    data:doctors,
+    nextCursor,
+    hasMore : doctors.length === limit
+  })
+
+   
+   }  catch (error) {
+    console.log(error); // logs full details in your terminal — do this always
+    res.status(500).json({ error: error.message || "Something went wrong" });
+  }
 }
 // 1781694557646-390000729-01.jpg
 module.exports = {drdata,getDoctorData}
