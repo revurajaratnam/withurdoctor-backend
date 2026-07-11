@@ -98,7 +98,7 @@ const getDoctorData = async (req,res)=>{
 
    
    }  catch (error) {
-    console.log(error); // logs full details in your terminal — do this always
+    console.log(error); 
     res.status(500).json({ error: error.message || "Something went wrong" });
   }
 }
