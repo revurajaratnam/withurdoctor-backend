@@ -1,6 +1,7 @@
 const {DrProfialInfoData} = require("../model/DrProfileInfo");
 const sharp = require('sharp');
 const fs = require('fs');
+const mongoose = require("mongoose");
 
 
 const drdata = async (req,res) =>{
@@ -55,12 +56,30 @@ const drdata = async (req,res) =>{
 const getDoctorData = async (req,res)=>{
    try {
   const limit = 10;
-  const {cursor , search , location , id, gender} = req.query;
+  const {cursor , search , location , phone , id, gender , experienceMin , experienceMax ,consultationFeeMin ,consultationFeeMax} = req.query;
   const filter = {};
   if(cursor) filter._id = {$gt:cursor};
-  if(id) filter.id = id;
+  
+  if (id) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: "Invalid doctor id" });
+    }
+    filter._id = id;
+  }
+  if(phone) filter.phone = phone;
   if(location) filter.address = {$regex: location , $options: "i"};
   if(gender) filter.gender ={$regex: `^${gender}$`,$options:"i"}
+  if(experienceMin || experienceMax) {
+    filter.experience ={};
+  if(experienceMin) filter.experience.$gte= Number(experienceMin)
+  if(experienceMax) filter.experience.$lte= Number(experienceMax)
+  }
+ if(consultationFeeMin || consultationFeeMax){
+    filter.consultationFee ={};
+    if(consultationFeeMin) filter.consultationFee.$gte =Number(consultationFeeMin)
+        if(consultationFeeMax) filter.consultationFee.$lte =Number(consultationFeeMax)
+ }
+
   if(search){
     filter.$or =[
       {fullname:{$regex:search , $options:"i"}},
@@ -79,7 +98,7 @@ const getDoctorData = async (req,res)=>{
 
    
    }  catch (error) {
-    console.log(error); // logs full details in your terminal — do this always
+    console.log(error); 
     res.status(500).json({ error: error.message || "Something went wrong" });
   }
 }
