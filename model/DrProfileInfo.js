@@ -1,51 +1,40 @@
 const mongoose = require("mongoose");
 
-const drProfileinfoSchema= mongoose.Schema({
-        fullname:{
-            type:String,
-            required:true
-        },
-        about:{
-            type:String,
-            maxlength:350
-        },
-        address:{
-            type:String,
-            maxLength:100
-        },
-        experience:{
-            type:String
-        },
-        qualification:{
-            type:String
-        },
-        specialization:{
-            type:String
-        },
-        surgeries:{
-            type:String
-        },
-        consultation:{
-            type:Number,
+const doctorProfileSchema = new mongoose.Schema({
+  fullname: String,
+  consultation: Number,
+  specialization: String,
+  address: String,
+  experience: String,
+  gender: String,
 
+  weeklySchedule: {
+    type: Map,
+    of: [
+      {
+        startTime: String,
+        endTime: String,
+        slotDurationMinutes: {
+          type: Number,
+          default: 30,
         },
-        languages:{
-            type:String
-        },
-        profilephoto:{
-            type:String
-        },
-        gallery:[{
-            type:String
-        }],
-        hfeed:{
-            type:String
-        },
-        consult:{
-            type:String
-        }
+      },
+    ],
+    default: {},
+  },
+
+  unavailableDates: {
+    type: [String],
+    default: [],
+  },
 });
 
-const DrProfialInfoData = mongoose.model("DrprofileData",drProfileinfoSchema);
+const DrProfialInfoData =
+  mongoose.models.DrProfialInfoData ||
+  mongoose.model(
+    "DrProfialInfoData",
+    doctorProfileSchema,
+    "drprofialinfodatas"
+  );
 
-    module.exports = {DrProfialInfoData};
+module.exports = DrProfialInfoData;

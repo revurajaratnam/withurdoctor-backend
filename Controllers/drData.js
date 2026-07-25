@@ -1,4 +1,4 @@
-const {DrProfialInfoData} = require("../model/DrProfileInfo");
+const DrProfialInfoData = require("../model/DrProfileInfo");
 const sharp = require('sharp');
 const fs = require('fs');
 const mongoose = require("mongoose");

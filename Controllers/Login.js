@@ -28,16 +28,16 @@ const LoginInfo = async (req, res) => {
         message: "Invalid password",
       });
     }
-    const token = jwt.sign({id:user._id, email:user.email,role:"doctor" }, process.env.JWT_SECRET, { expiresIn: "1h" });  
+    const token = jwt.sign({id:user._id, email:user.email,name:user.fullname ,role:"patient"}, process.env.JWT_SECRET, { expiresIn: "12h" });  
     return res.json({
       success: true,
       message: "Login Successful",
       token,
       user:{
+        name:user.fullname,
         email:user.email,
-        role: "doctor",
+        role: "patient",
       }
-      
     });
     console.log(token);
   } catch (err) {

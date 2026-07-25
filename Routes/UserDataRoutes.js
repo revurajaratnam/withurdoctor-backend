@@ -17,6 +17,7 @@ Route.post("/VerifyEmail",verifyOTP);
 Route.post("/resendOTP",onetimepass);
 Route.get("/signup",LoginInfo);
 Route.post("/Login",LoginInfo)
+// Route.post("/userLogin",LoginInfo)
 Route.get("/Profile",verifyToken,dashboard)
 Route.get("/VerifyEmail",verifyOTP)
 Route.post("/drData",upload.fields([
@@ -28,7 +29,43 @@ Route.post("/api/auth/google",googleAuth)
 Route.get("/api/auth/google",googleAuth)
 // Route.post("/userlogin",userLogin)
 
+const {
+    getDoctorFee,
+    getAvailabilitySummary,
+    getSlotsForDate,
+    createAppointment,
+    cancelAppointment,
+  } = require("../claudeAi/appointmentController");
+const bookApp = require("../Controllers/BookAppointment");
+  
+  
+  
+  Route.get(
+    "/doctors/:doctorId/fee",
+    getDoctorFee
+  );
+  
+  Route.get(
+    "/doctors/:doctorId/availability",
+    getAvailabilitySummary
+  );
+  
+  Route.get(
+    "/doctors/:doctorId/slots",
+    getSlotsForDate
+  );
+  
+  Route.post(
+    "/appointments",
+    createAppointment
+  );
+  
+  Route.patch(
+    "/appointments/:id/cancel",
+    cancelAppointment
+  );
+  Route.post("/appointmentBooking",verifyToken,bookApp);
 
-
-
-module.exports={Route}
+  
+  // Named export to match your existing `const {Route} = require("./Routes/UserDataRoutes")` pattern
+  module.exports = {Route }; //, AppointmentRoutes: Route

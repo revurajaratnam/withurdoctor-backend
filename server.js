@@ -1,12 +1,13 @@
 const express = require("express");
 const cors = require("cors")
-const {Route} = require("./Routes/UserDataRoutes")
+const {Route, AppointmentRoutes} = require("./Routes/UserDataRoutes")
 const bodyParser = require("body-parser")
 require("dotenv").config()
 const dbconnect = require('./Db/dBConnect')
 const PORT = process.env.PORT || 3500;
 const app=(express());
-const path = require("path")
+const path = require("path");
+
 
 
 app.use(express.json())
@@ -30,6 +31,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 //     )
 // })
 app.use(Route)
+// app.use("/api",AppointmentRoutes)
 
 app.listen(PORT,() =>{
         console.log(`Server Running on ${PORT}`);
