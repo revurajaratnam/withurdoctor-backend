@@ -17,12 +17,12 @@
             });
         }
         const existingUser = await drData.findOne({email});
-        // if(existingUser){
-        //     return res.json({
-        //         success:false,
-        //         message:"Email already Exits"
-        //     });
-        // }
+        if(existingUser){
+            return res.json({
+                success:false,
+                message:"This email address already exists in your account."
+            });
+        }
         const user = new drData(req.body);
         await user.save();
         console.log(req.body);
