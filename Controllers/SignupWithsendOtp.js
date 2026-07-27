@@ -5,7 +5,7 @@ const User_Name = process.env.User_Name;
 const OTPStore ={};
   const onetimepass = async (req,res) =>{
     try {
-        // const OTP = Math.floor(100000 + Math.random() * 900000).toString();
+        const OTP = Math.floor(100000 + Math.random() * 900000).toString();
         await transporter.verify();
         console.log('OTP server is Established');
         
@@ -23,7 +23,7 @@ const OTPStore ={};
             
 
          await transporter.sendMail({
-            from:User_Name,
+            from:`WithUrDoctor<{$User_Name}>`,
             to:email,
             subject : "One Time Password",
             // text : `Youre OTP is : ${OTP} OTP Valid for 10 min only`,

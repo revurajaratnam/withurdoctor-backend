@@ -20,11 +20,11 @@ const mongoose  = require('mongoose');
                 type:Boolean,
                 default:false
             },
-            expireAt:{
-                type:Date,
-                default:new Date(Date.now() + 10*60*100),
-                expires:0,
-            }
+            // expireAt:{
+            //     type:Date,
+            //     default:new Date(Date.now() + 10*60*100),
+            //     expires:0,
+            // }
     });
 
     const DrInfoData = mongoose.model("DrData",DrInfo);
