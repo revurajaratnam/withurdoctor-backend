@@ -11,6 +11,11 @@ const { googleAuth } = require("../Controllers/googleAuth");
 const { userLogin } = require("../Controllers/UserLogin");
 const { doctorOnly } = require("../middlewares/dr-only");
 const {drDataSignup} = require("../Controllers/Signup")
+
+
+
+
+
 Route.post("/signup",UserDataContoller,onetimepass);
 Route.post("/VerifyEmail",verifyOTP);
 Route.post("/resendOTP",onetimepass);
