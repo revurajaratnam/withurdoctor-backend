@@ -1,76 +1,98 @@
-const transporter = require("../utils/Mailer")
+const transporter = require("../utils/Mailer");
 
-    const wuDr_Mail = process.env.EMAIL;
-const bookApp= async (req,res)=>{
-    console.log(req.body);
-    console.log(req.user)
+const wuDr_Mail = process.env.EMAIL;
 
-    try {
-        await transporter.verify();
-        console.log("OTP Successfully..!")
-        // console.log(req.body);
-        const patientEmail = req.user?.email;
-        const patientName = req.user?.name;
-        const patientRole = req.user?.role;
-        const doctorName = req.body?.doctorName;
-        const doctorEmail = req.body?.doctorEmail;
-        const appointmentDate = req.body?.appointmentDate
-        const appointmentTime = req.body?.timeSlot;
-        console.log(patientEmail);
-        console.log(doctorName);
-        console.log(patientRole);
-        
-        await transporter.sendMail({
-            from:wuDr_Mail,
-            to:patientEmail,
-            subject:`Confirmed: Your Appointment with Dr ${doctorName}`,
-            html:
-            `
-            <h2> Your appointment is confirmed. </h2>
-             <h3> Dr. ${doctorName} </h3>
-             <p>Appointment date ${appointmentDate} </p>
-             <p>Appointment time ${appointmentTime} </p> <br>
-             <p> Note: Please arrive 30 minutes early. </p>
+const bookApp = async (req, res) => {
+  console.log("========== APPOINTMENT START ==========");
+  console.log("Request body:", req.body);
+  console.log("Logged-in user:", req.user);
 
-             <h5> team <h5>
-             <p>WithUrDoctor </p>
+  try {
+    const patientEmail = req.user?.email;
+    const patientName = req.user?.name;
 
-             <a href="http://localhost:5173/Login" ><button style="color: white; background: #199FD9; border-radius: 10px; border:none; padding:10px
-             ">Book Agian </button> </a>
-             `
-             
-        })
-        await transporter.sendMail({
-            from:wuDr_Mail,
-            to:doctorEmail,
-            subject:`New Appointment Scheduled with ${patientName}`,
-            html:
-            `
-            <h2> Dear Dr. ${doctorName} , </h2>
-            <p>This email is to notify you that a new appointment has been scheduled on youre calender. </p>
-            <h2>Appointment Details </h2>
-            <h4> Patient Name : ${patientName} </h4>
-            <h4> Date : ${appointmentDate} </h4>
-            <h4> Time ${appointmentTime} </h4>
+    const doctorName = req.body?.doctorName;
+    const doctorEmail = req.body?.doctorEmail;
 
+    const appointmentDate = req.body?.appointmentDate;
+    const appointmentTime = req.body?.timeSlot;
 
-            <h2> team </h2>
-            <h3> WithUrDoctor </h3>
+    console.log("Patient email:", patientEmail);
+    console.log("Doctor email:", doctorEmail);
+    console.log("Sending email to patient...");
 
-            <a href="http://localhost:5173/Login" ><button style="color: white; background: #199FD9; border-radius: 10px; border:none; padding:10px
-             ">Book Agian </button> </a>
+    // EMAIL TO PATIENT
+    const patientMail = await transporter.sendMail({
+      from: wuDr_Mail,
+      to: patientEmail,
+      subject: `Confirmed: Your Appointment with Dr ${doctorName}`,
+      html: `
+        <h2>Your appointment is confirmed.</h2>
+        <h3>Dr. ${doctorName}</h3>
 
-            `
-            
-        })
-        res.json({
-            message:"Youre Appointment Booked Successfuly"
-        })
+        <p>Appointment date: ${appointmentDate}</p>
+        <p>Appointment time: ${appointmentTime}</p>
 
-    } catch (error) {
-        console.log(error);
-    }
-    
-}
+        <p>Note: Please arrive 30 minutes early.</p>
 
-module.exports= bookApp;
+        <p>Team WithUrDoctor</p>
+
+        <a href="https://withurdoctor.vercel.app/Login">
+          Book Again
+        </a>
+      `,
+    });
+
+    console.log(
+      "Patient email sent successfully:",
+      patientMail.messageId
+    );
+
+    console.log("Sending email to doctor...");
+
+    // EMAIL TO DOCTOR
+    const doctorMail = await transporter.sendMail({
+      from: wuDr_Mail,
+      to: doctorEmail,
+      subject: `New Appointment Scheduled with ${patientName}`,
+      html: `
+        <h2>Dear Dr. ${doctorName},</h2>
+
+        <p>A new appointment has been scheduled.</p>
+
+        <h3>Appointment Details</h3>
+
+        <p>Patient Name: ${patientName}</p>
+        <p>Date: ${appointmentDate}</p>
+        <p>Time: ${appointmentTime}</p>
+
+        <p>Team WithUrDoctor</p>
+      `,
+    });
+
+    console.log(
+      "Doctor email sent successfully:",
+      doctorMail.messageId
+    );
+
+    console.log("========== APPOINTMENT COMPLETE ==========");
+
+    return res.status(200).json({
+      success: true,
+      message: "Your appointment was booked successfully",
+    });
+
+  } catch (error) {
+    console.error("========== EMAIL ERROR ==========");
+    console.error(error);
+    console.error("Message:", error.message);
+
+    return res.status(500).json({
+      success: false,
+      message: "Appointment booking failed",
+      error: error.message,
+    });
+  }
+};
+
+module.exports = bookApp;
