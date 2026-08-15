@@ -1,6 +1,6 @@
 const transporter = require("../utils/Mailer")
 
-    const wuDr_Mail = process.env.User_name;
+    const wuDr_Mail = process.env.EMAIL;
 const bookApp= async (req,res)=>{
     console.log(req.body);
     console.log(req.user)
