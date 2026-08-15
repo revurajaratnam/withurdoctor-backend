@@ -15,7 +15,7 @@ const bookApp= async (req,res)=>{
         const doctorName = req.body?.doctorName;
         const doctorEmail = req.body?.doctorEmail;
         const appointmentDate = req.body?.appointmentDate
-        const appointmentTime = req.body?.timeslot;
+        const appointmentTime = req.body?.timeSlot;
         console.log(patientEmail);
         console.log(doctorName);
         console.log(patientRole);
