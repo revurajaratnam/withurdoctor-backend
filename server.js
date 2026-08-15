@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors")
-const {Route, AppointmentRoutes} = require("./Routes/UserDataRoutes")
+const {Route} = require("./Routes/UserDataRoutes")
 const bodyParser = require("body-parser")
 require("dotenv").config()
 const dbconnect = require('./Db/dBConnect')
@@ -11,12 +11,23 @@ const path = require("path");
 
 
 app.use(express.json())
-app.use(cors());
+const corsOptions = {
+  origin: true,
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+app.use(cors(corsOptions));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:true}))
 // app.use(express.static);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
+// app.use(cors({
+//     origin: [
+//         "http://localhost:5173",
+//         "https://rigor-astute-buddhist.ngrok-free.dev"
+//     ],
+//     credentials: true
+// }));
 
 
 
