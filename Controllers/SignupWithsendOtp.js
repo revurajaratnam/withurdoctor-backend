@@ -1,69 +1,92 @@
-const DrInfoData = require('../model/DrLoginInfo');
-const transporter = require('../utils/Mailer');
-require('dotenv').config();
-const User_Name = process.env.User_Name;
+const DrInfoData = require("../model/DrLoginInfo");
+const transporter = require("../utils/Mailer");
+
+const User_Name = process.env.EMAIL;
+
 const SERVER_PORT = process.env.PORT || 3500;
-const SERVER_HOST = process.env.SERVER_HOST || `http://localhost:${SERVER_PORT}`;
-const OTPStore = {};
+
+// Production URL
+const SERVER_HOST =
+  process.env.SERVER_HOST || "https://withurdoctor.onrender.com";
 
 const onetimepass = async (req, res) => {
   try {
-    const OTP = Math.floor(100000 + Math.random() * 900000).toString();
-    await transporter.verify();
-    console.log('OTP server is Established');
-
-    console.log(req.body);
+    console.log("Signup request:", req.body);
 
     const { email } = req.body;
 
-    console.log('Verify Email:', email);
-    console.log('OTPStore:', OTPStore);
-    console.log('Stored OTP:', OTPStore[email]);
+    if (!email) {
+      return res.status(400).json({
+        message: "Email is required",
+      });
+    }
 
-    await transporter.sendMail({
-      from: `WithUrDoctor <${User_Name}>`,
+    console.log("Sending verification email to:", email);
+
+    const info = await transporter.sendMail({
+      from: `"WithUrDoctor" <${User_Name}>`,
       to: email,
-      subject: 'One Time Password',
+      subject: "Verify your WithUrDoctor account",
+
       html: `
-            <h2>Email Verification</h2>
-            <p>Click the button below to verify your email.</p>
-            <a href="${SERVER_HOST}/VerifyEmail?email=${email}">
-              Verify Email
-            </a>
-          `,
+        <h2>Email Verification</h2>
+
+        <p>Click the button below to verify your email.</p>
+
+        <a href="${SERVER_HOST}/VerifyEmail?email=${encodeURIComponent(email)}">
+          Verify Email
+        </a>
+      `,
     });
 
-    res.status(200).json({
-      message: 'Verification link sent successfully',
+    console.log("Email sent successfully:", info.messageId);
+
+    return res.status(200).json({
+      success: true,
+      message: "Verification link sent successfully",
     });
+
   } catch (error) {
-    res.status(500).json({
-      message: 'Verification link send failed',
+    console.error("========== EMAIL ERROR ==========");
+    console.error("Code:", error.code);
+    console.error("Message:", error.message);
+    console.error(error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Verification link send failed",
       error: error.message,
     });
   }
 };
 
-  const verifyOTP = async (req,res) =>{
-    try {
-        const {email}= req.query;
+
+const verifyOTP = async (req, res) => {
+  try {
+    const { email } = req.query;
 
     await DrInfoData.updateOne(
-        {email},
-        {
-            $set:{
-                isVerified:true,
-            }
-        }
-    )
-    return res.redirect("http://localhost:5173/Login");
-    } catch (error) {
-        res.send("Verification Failed")
-    }
+      { email },
+      {
+        $set: {
+          isVerified: true,
+        },
+      }
+    );
 
+    return res.redirect(
+      "https://withurdoctor.vercel.app/Login"
+    );
+
+  } catch (error) {
+    console.error("Verification failed:", error);
+
+    return res.status(500).send("Verification Failed");
   }
-  
+};
 
 
-
-  module.exports ={ onetimepass,verifyOTP}
+module.exports = {
+  onetimepass,
+  verifyOTP,
+};
