@@ -6,6 +6,7 @@ const drDataSignup = async (req, res) => {
       fullname: req.body.fullname,
       email: req.body.email,
       pass: req.body.pass,
+      role: req.body.role,
     });
 
     res.status(201).json({
