@@ -36,7 +36,7 @@ const LoginInfo = async (req, res) => {
       user:{
         name:user.fullname,
         email:user.email,
-        role: "patient",
+        role: user.role,
       }
     });
     console.log(token);
