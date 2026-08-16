@@ -16,6 +16,12 @@ const mongoose  = require('mongoose');
                 required:true,
                 maxlength:[15],
             },
+            role:{
+                type:String,
+                required:true,
+                enum:["doctor","patinet","admin"],
+                default:"patient",
+            },
             isVerified:{
                 type:Boolean,
                 default:false
