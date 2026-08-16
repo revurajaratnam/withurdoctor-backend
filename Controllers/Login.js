@@ -6,7 +6,7 @@ const LoginInfo = async (req, res) => {
     const { email, pass , role } = req.body;
     
 
-    const user = await DrInfoData.findOne({ email , role });
+    const user = await DrInfoData.findOne({ email:email.trim() , role : role });
 
     if (!user) {
       return res.json({
