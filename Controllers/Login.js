@@ -28,7 +28,7 @@ const LoginInfo = async (req, res) => {
         message: "Invalid password",
       });
     }
-    const token = jwt.sign({id:user._id, email:user.email,name:user.fullname ,role}, process.env.JWT_SECRET, { expiresIn: "12h" });  
+    const token = jwt.sign({id:user._id, email:user.email,name:user.fullname ,role:user.role}, process.env.JWT_SECRET, { expiresIn: "12h" });  
     return res.json({
       success: true,
       message: "Login Successful",
