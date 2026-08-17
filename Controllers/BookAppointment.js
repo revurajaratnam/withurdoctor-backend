@@ -316,7 +316,7 @@ const bookApp = async (req, res) => {
       success: true,
 
       message:
-        "Your appointment was booked successfully",
+        "Your appointment was booked successfully.",
 
       patientEmailSent,
 
