@@ -40,7 +40,10 @@ Route.get("/", (req, res) => {
 const bookApp = require("../Controllers/BookAppointment");
 const DrSignup = require("../Controllers/Signup");
   
-  Route.post("/appointmentBooking",verifyToken,bookApp);
+  Route.post("/appointmentBooking", (req, res, next) => {
+    console.log("Appointment payload before auth:", req.body);
+    next();
+  }, verifyToken, bookApp);
 
   
   

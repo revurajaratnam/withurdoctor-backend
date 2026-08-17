@@ -2,16 +2,16 @@ const jwt = require('jsonwebtoken')
 
 const verifyToken = (req,res,next)=>{
 
+    const authHeader = req.headers.authorization || req.headers.Authorization || req.headers["x-auth-token"];
+
     console.log("===== TOKEN CHECK =====");
     console.log("Method:", req.method);
     console.log("URL:", req.originalUrl);
     console.log("Content-Type:", req.headers["content-type"]);
-    console.log("Authorization:", req.headers.authorization);
+    console.log("Authorization:", authHeader);
     console.log("Request body:", req.body);
 
-    const authHeader = req.headers.authorization;
-
-    if(!authHeader?.startsWith("Bearer")){
+    if(!authHeader || !String(authHeader).startsWith("Bearer ")){
         console.log("Token missing or malformed. Request blocked before controller.");
         return res.status(401).json({
             success:false,
