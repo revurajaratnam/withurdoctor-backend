@@ -34,7 +34,7 @@ const LoginInfo = async (req, res) => {
       message: "Login Successful",
       token,
       user:{
-        id : user._id,
+        _id : user._id,
         name:user.fullname,
         email:user.email,
         role: user.role,
