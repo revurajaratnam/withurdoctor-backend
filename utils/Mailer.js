@@ -1,28 +1,19 @@
 const nodemailer = require("nodemailer");
 const dns = require("dns");
 
+dns.setDefaultResultOrder("ipv4first");
+
 const transporter = nodemailer.createTransport({
   service: "gmail",
-  host: "smtp.gmail.com",
-  port: 465,
-  secure: true,
 
   auth: {
     user: process.env.EMAIL,
-    pass: process.env.EMAIL_PASSWORD,
+    pass: process.env.EMAIL_PASS,
   },
 
-  // Force Gmail SMTP to use IPv4
-  lookup: (hostname, options, callback) => {
-    dns.lookup(hostname, { family: 4 }, callback);
-  },
-
-  connectionTimeout: 30000,
-  greetingTimeout: 30000,
-  socketTimeout: 30000,
-  tls: {
-    rejectUnauthorized: false,
-  },
+  connectionTimeout: 15000,
+  greetingTimeout: 15000,
+  socketTimeout: 15000,
 });
 
 module.exports = transporter;
