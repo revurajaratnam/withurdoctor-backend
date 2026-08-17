@@ -1,22 +1,7 @@
-const nodemailer = require("nodemailer");
-const dns = require("dns");
+const { Resend } = require("resend");
 
-// Prefer IPv4
-dns.setDefaultResultOrder("ipv4first");
-
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false,
-
-  auth: {
-    user: process.env.EMAIL,
-    pass: process.env.EMAIL_PASS,
-  },
-
-  connectionTimeout: 30000,
-  greetingTimeout: 30000,
-  socketTimeout: 30000,
-});
+const transporter = new Resend(
+  process.env.RESEND_API_KEY
+);
 
 module.exports = transporter;

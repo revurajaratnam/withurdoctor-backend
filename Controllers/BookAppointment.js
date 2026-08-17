@@ -1,6 +1,6 @@
 const transporter = require("../utils/Mailer");
 
-const wuDr_Mail = process.env.EMAIL;
+const wuDr_Mail = process.env.EMAIL_FROM;
 
 const bookApp = async (req, res) => {
   console.log("========== APPOINTMENT START ==========");
@@ -11,6 +11,7 @@ const bookApp = async (req, res) => {
     // ================================
     // PATIENT DETAILS
     // ================================
+
     const patientEmail =
       req.user?.email ||
       req.body?.patientEmail;
@@ -21,24 +22,33 @@ const bookApp = async (req, res) => {
       req.body?.patientName ||
       "Patient";
 
+
     // ================================
     // DOCTOR DETAILS
     // ================================
-    const doctorName = req.body?.doctorName;
-    const doctorEmail = req.body?.doctorEmail;
+
+    const doctorName =
+      req.body?.doctorName;
+
+    const doctorEmail =
+      req.body?.doctorEmail;
+
 
     // ================================
     // APPOINTMENT DETAILS
     // ================================
+
     const appointmentDate =
       req.body?.appointmentDate;
 
     const appointmentTime =
       req.body?.timeSlot;
 
+
     // ================================
     // VALIDATION
     // ================================
+
     if (!patientEmail) {
       return res.status(400).json({
         success: false,
@@ -67,10 +77,23 @@ const bookApp = async (req, res) => {
       });
     }
 
+
     console.log("Patient email:", patientEmail);
     console.log("Patient name:", patientName);
     console.log("Doctor email:", doctorEmail);
     console.log("Doctor name:", doctorName);
+
+
+    // ================================
+    // EMAIL STATUS
+    // ================================
+
+    let patientEmailSent = false;
+    let doctorEmailSent = false;
+
+    let patientEmailError = null;
+    let doctorEmailError = null;
+
 
     // ==========================================
     // SEND EMAIL TO PATIENT
@@ -78,65 +101,102 @@ const bookApp = async (req, res) => {
 
     console.log("Sending email to patient...");
 
-    let patientMail;
-
     try {
-      patientMail = await transporter.sendMail({
-        from: `"WithUrDoctor" <${wuDr_Mail}>`,
-        to: patientEmail,
-        subject: `Appointment Confirmed with Dr. ${doctorName}`,
-        html: `
-          <div style="font-family: Arial, sans-serif;">
-            <h2>Your Appointment is Confirmed</h2>
+      const patientMail =
+        await transporter.emails.send({
 
-            <p>Hello ${patientName},</p>
+          from: wuDr_Mail,
 
-            <p>Your appointment has been successfully booked.</p>
+          to: patientEmail,
 
-            <h3>Appointment Details</h3>
+          subject:
+            `Appointment Confirmed with Dr. ${doctorName}`,
 
-            <p>
-              <strong>Doctor:</strong>
-              Dr. ${doctorName}
-            </p>
+          html: `
+            <div style="font-family: Arial, sans-serif;">
 
-            <p>
-              <strong>Date:</strong>
-              ${appointmentDate}
-            </p>
+              <h2>
+                Your Appointment is Confirmed
+              </h2>
 
-            <p>
-              <strong>Time:</strong>
-              ${appointmentTime}
-            </p>
+              <p>
+                Hello ${patientName},
+              </p>
 
-            <p>
-              Please arrive 30 minutes early.
-            </p>
+              <p>
+                Your appointment has been successfully booked.
+              </p>
 
-            <br />
+              <h3>
+                Appointment Details
+              </h3>
 
-            <p>
-              Regards,<br />
-              <strong>Team WithUrDoctor</strong>
-            </p>
-          </div>
-        `,
-      });
+              <p>
+                <strong>Doctor:</strong>
+                Dr. ${doctorName}
+              </p>
+
+              <p>
+                <strong>Date:</strong>
+                ${appointmentDate}
+              </p>
+
+              <p>
+                <strong>Time:</strong>
+                ${appointmentTime}
+              </p>
+
+              <p>
+                Please arrive 30 minutes early.
+              </p>
+
+              <br />
+
+              <p>
+                Regards,<br />
+
+                <strong>
+                  Team WithUrDoctor
+                </strong>
+              </p>
+
+            </div>
+          `,
+        });
+
 
       console.log(
-        "Patient email sent:",
-        patientMail.messageId
+        "Patient Resend response:",
+        patientMail
       );
+
+
+      if (patientMail?.data?.id) {
+        patientEmailSent = true;
+      }
+
+
+      if (patientMail?.error) {
+        patientEmailError =
+          patientMail.error.message;
+
+        console.error(
+          "PATIENT EMAIL FAILED:",
+          patientMail.error
+        );
+      }
 
     } catch (mailError) {
+
+      patientEmailError =
+        mailError.message;
+
       console.error(
         "PATIENT EMAIL FAILED:",
-        mailError.message
+        mailError
       );
-
-      // Continue to doctor email instead of immediately crashing
     }
+
 
     // ==========================================
     // SEND EMAIL TO DOCTOR
@@ -144,87 +204,148 @@ const bookApp = async (req, res) => {
 
     console.log("Sending email to doctor...");
 
-    let doctorMail;
-
     try {
-      doctorMail = await transporter.sendMail({
-        from: `"WithUrDoctor" <${wuDr_Mail}>`,
-        to: doctorEmail,
-        subject: `New Appointment - ${patientName}`,
-        html: `
-          <div style="font-family: Arial, sans-serif;">
-            <h2>New Appointment Scheduled</h2>
+      const doctorMail =
+        await transporter.emails.send({
 
-            <p>Hello Dr. ${doctorName},</p>
+          from: wuDr_Mail,
 
-            <p>A new appointment has been scheduled.</p>
+          to: doctorEmail,
 
-            <h3>Patient Details</h3>
+          subject:
+            `New Appointment - ${patientName}`,
 
-            <p>
-              <strong>Patient Name:</strong>
-              ${patientName}
-            </p>
+          html: `
+            <div style="font-family: Arial, sans-serif;">
 
-            <p>
-              <strong>Patient Email:</strong>
-              ${patientEmail}
-            </p>
+              <h2>
+                New Appointment Scheduled
+              </h2>
 
-            <h3>Appointment Details</h3>
+              <p>
+                Hello Dr. ${doctorName},
+              </p>
 
-            <p>
-              <strong>Date:</strong>
-              ${appointmentDate}
-            </p>
+              <p>
+                A new appointment has been scheduled.
+              </p>
 
-            <p>
-              <strong>Time:</strong>
-              ${appointmentTime}
-            </p>
+              <h3>
+                Patient Details
+              </h3>
 
-            <br />
+              <p>
+                <strong>Patient Name:</strong>
+                ${patientName}
+              </p>
 
-            <p>
-              <strong>Team WithUrDoctor</strong>
-            </p>
-          </div>
-        `,
-      });
+              <p>
+                <strong>Patient Email:</strong>
+                ${patientEmail}
+              </p>
+
+              <h3>
+                Appointment Details
+              </h3>
+
+              <p>
+                <strong>Date:</strong>
+                ${appointmentDate}
+              </p>
+
+              <p>
+                <strong>Time:</strong>
+                ${appointmentTime}
+              </p>
+
+              <br />
+
+              <p>
+                <strong>
+                  Team WithUrDoctor
+                </strong>
+              </p>
+
+            </div>
+          `,
+        });
+
 
       console.log(
-        "Doctor email sent:",
-        doctorMail.messageId
+        "Doctor Resend response:",
+        doctorMail
       );
 
+
+      if (doctorMail?.data?.id) {
+        doctorEmailSent = true;
+      }
+
+
+      if (doctorMail?.error) {
+        doctorEmailError =
+          doctorMail.error.message;
+
+        console.error(
+          "DOCTOR EMAIL FAILED:",
+          doctorMail.error
+        );
+      }
+
     } catch (mailError) {
+
+      doctorEmailError =
+        mailError.message;
+
       console.error(
         "DOCTOR EMAIL FAILED:",
-        mailError.message
+        mailError
       );
     }
+
 
     // ==========================================
     // SUCCESS RESPONSE
     // ==========================================
 
-    console.log("========== APPOINTMENT COMPLETE ==========");
+    console.log(
+      "========== APPOINTMENT COMPLETE =========="
+    );
 
     return res.status(200).json({
       success: true,
-      message: "Your appointment was booked successfully",
-      patientEmailSent: !!patientMail,
-      doctorEmailSent: !!doctorMail,
+
+      message:
+        "Your appointment was booked successfully",
+
+      patientEmailSent,
+
+      doctorEmailSent,
+
+      patientEmailError,
+
+      doctorEmailError,
     });
 
   } catch (error) {
-    console.error("========== APPOINTMENT ERROR ==========");
+
+    console.error(
+      "========== APPOINTMENT ERROR =========="
+    );
+
     console.error(error);
-    console.error("Message:", error.message);
+
+    console.error(
+      "Message:",
+      error.message
+    );
 
     return res.status(500).json({
       success: false,
-      message: "Appointment booking failed",
+
+      message:
+        "Appointment booking failed",
+
       error: error.message,
     });
   }
