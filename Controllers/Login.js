@@ -3,10 +3,10 @@ const jwt = require('jsonwebtoken')
 
 const LoginInfo = async (req, res) => {
   try {
-    const { email, pass , role } = req.body;
+    const { email, pass  } = req.body;
     
 
-    const user = await DrInfoData.findOne({ email:email.trim() , role : role });
+    const user = await DrInfoData.findOne({ email:email.trim() });
 
     if (!user) {
       return res.json({
