@@ -33,9 +33,10 @@
         console.log(req.body);
             next()
        } catch (error) {
+            console.error("Signup save failed:", error);
             res.status(500).json({
                 success:false,
-                message:"Server Error"
+                message: error.message || "Server Error"
             })
        }
            
