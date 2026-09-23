@@ -21,7 +21,7 @@ Route.post("/VerifyEmail",verifyOTP);
 Route.post("/resendOTP",onetimepass);
 Route.get("/signup",drDataSignup);
 Route.post("/Login",LoginInfo)
-// Route.post("/userLogin",LoginInfo)
+Route.post("/userLogin",LoginInfo)
 Route.get("/Profile",verifyToken,dashboard)
 Route.get("/VerifyEmail",verifyOTP)
 Route.post("/drData",upload.fields([

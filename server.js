@@ -1,8 +1,8 @@
 const express = require("express");
 const cors = require("cors");
-const { Route } = require("./Routes/UserDataRoutes");
 const bodyParser = require("body-parser");
 require("dotenv").config();
+const { Route } = require("./Routes/UserDataRoutes");
 
 const dbconnect = require("./Db/dBConnect");
 const path = require("path");

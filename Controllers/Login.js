@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken')
 const LoginInfo = async (req, res) => {
   try {
     const { email, pass  } = req.body;
-    
+    console.log(req.body);
 
     const user = await DrInfoData.findOne({ email:email.trim() });
 

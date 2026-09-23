@@ -1,6 +1,6 @@
-const transporter = require("../utils/Mailer");
+const { sendEmail } = require("../utils/Mailer");
 
-const wuDr_Mail = process.env.EMAIL_FROM;
+const wuDr_Mail = process.env.EMAIL_FROM || process.env.EMAIL || "noreply@withurdoctor.com";
 
 const bookApp = async (req, res) => {
   console.log("========== APPOINTMENT START ==========");
@@ -103,7 +103,7 @@ const bookApp = async (req, res) => {
 
     try {
       const patientMail =
-        await transporter.emails.send({
+        await sendEmail({
 
           from: wuDr_Mail,
 
@@ -206,7 +206,7 @@ const bookApp = async (req, res) => {
 
     try {
       const doctorMail =
-        await transporter.emails.send({
+        await sendEmail({
 
           from: wuDr_Mail,
 

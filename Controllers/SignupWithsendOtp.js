@@ -1,5 +1,5 @@
 const DrInfoData = require("../model/DrLoginInfo");
-const transporter = require("../utils/Mailer");
+const { sendEmail } = require("../utils/Mailer");
 
 const User_Name = process.env.EMAIL;
 
@@ -23,11 +23,10 @@ const onetimepass = async (req, res) => {
 
     console.log("Sending verification email to:", email);
 
-    const info = await transporter.sendMail({
+    const info = await sendEmail({
       from: `"WithUrDoctor" <${User_Name}>`,
       to: email,
       subject: "Verify your WithUrDoctor account",
-
       html: `
         <h2>Email Verification</h2>
 
@@ -39,7 +38,7 @@ const onetimepass = async (req, res) => {
       `,
     });
 
-    console.log("Email sent successfully:", info.messageId);
+    console.log("Email sent successfully:", info?.id || info?.messageId || info);
 
     return res.status(200).json({
       success: true,
