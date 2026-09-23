@@ -8,6 +8,14 @@ const User_Name =
   process.env.EMAIL ||
   process.env.GMAIL_USER;
 
+const User_Pass =
+  process.env.User_Pass ||
+  process.env.USER_PASS ||
+  process.env.EMAIL_PASSWORD ||
+  process.env.GMAIL_APP_PASSWORD ||
+  process.env.EMAIL_PASS ||
+  process.env.APP_PASSWORD;
+
 const FRONTEND_URL = process.env.FRONTEND_URL || 'https://withurdoctor.vercel.app';
 
 const onetimepass = async (req, res) => {
@@ -21,7 +29,7 @@ const onetimepass = async (req, res) => {
       });
     }
 
-    if (!User_Name || !process.env.User_Pass && !process.env.USER_PASS && !process.env.GMAIL_APP_PASSWORD && !process.env.EMAIL_PASS && !process.env.APP_PASSWORD) {
+    if (!User_Name || !User_Pass) {
       return res.status(500).json({
         success: false,
         message: 'Email configuration is missing. Add Gmail SMTP credentials in Render environment variables.',
