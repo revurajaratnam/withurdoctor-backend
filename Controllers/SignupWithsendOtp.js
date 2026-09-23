@@ -1,80 +1,58 @@
-﻿const DrInfoData = require("../model/DrLoginInfo");
-const { sendEmail } = require("../utils/Mailer");
+﻿const DrInfoData = require('../model/DrLoginInfo');
+const transporter = require('../utils/Mailer');
+require('dotenv').config();
 
-const User_Name = process.env.EMAIL;
-const emailVerificationEnabled = Boolean(process.env.RESEND_API_KEY && process.env.EMAIL);
+const User_Name =
+  process.env.User_Name ||
+  process.env.USER_NAME ||
+  process.env.EMAIL ||
+  process.env.GMAIL_USER;
 
-const SERVER_PORT = process.env.PORT || 3500;
-
-const SERVER_HOST =
-  process.env.SERVER_HOST || "https://withurdoctor.onrender.com";
+const FRONTEND_URL = process.env.FRONTEND_URL || 'https://withurdoctor.vercel.app';
 
 const onetimepass = async (req, res) => {
   try {
-    console.log("Signup request:", req.body);
-
     const { email } = req.body;
 
     if (!email) {
       return res.status(400).json({
-        message: "Email is required",
+        success: false,
+        message: 'Email is required',
       });
     }
 
-    if (!emailVerificationEnabled) {
-      console.warn(
-        "Email verification is disabled because RESEND_API_KEY or EMAIL is not configured."
-      );
-
-      await DrInfoData.updateOne(
-        { email },
-        {
-          $set: {
-            isVerified: true,
-          },
-        }
-      );
-
-      return res.status(200).json({
-        success: true,
-        message: "Account created successfully. Email verification is disabled on this server.",
-        emailVerificationEnabled: false,
+    if (!User_Name || !process.env.User_Pass && !process.env.USER_PASS && !process.env.GMAIL_APP_PASSWORD && !process.env.EMAIL_PASS && !process.env.APP_PASSWORD) {
+      return res.status(500).json({
+        success: false,
+        message: 'Email configuration is missing. Add Gmail SMTP credentials in Render environment variables.',
       });
     }
 
-    console.log("Sending verification email to:", email);
+    await transporter.verify();
+    console.log('SMTP server is established');
 
-    const info = await sendEmail({
-      from: `"WithUrDoctor" <${User_Name}>`,
+    await transporter.sendMail({
+      from: User_Name,
       to: email,
-      subject: "Verify your WithUrDoctor account",
+      subject: 'Verify your WithUrDoctor account',
       html: `
         <h2>Email Verification</h2>
-
         <p>Click the button below to verify your email.</p>
-
-        <a href="${SERVER_HOST}/VerifyEmail?email=${encodeURIComponent(email)}">
+        <a href="${FRONTEND_URL}/Login?email=${encodeURIComponent(email)}">
           Verify Email
         </a>
       `,
     });
 
-    console.log("Email sent successfully:", info?.id || info?.messageId || info);
-
     return res.status(200).json({
       success: true,
-      message: "Verification link sent successfully",
-      emailVerificationEnabled: true,
+      message: 'Verification link sent successfully',
     });
   } catch (error) {
-    console.error("========== EMAIL ERROR ==========");
-    console.error("Code:", error.code);
-    console.error("Message:", error.message);
-    console.error(error);
-
+    console.error('Email send failed:', error);
     return res.status(500).json({
       success: false,
-      message: "Verification link send failed",
+      message: 'Verification link send failed',
       error: error.message,
     });
   }
@@ -86,21 +64,14 @@ const verifyOTP = async (req, res) => {
 
     await DrInfoData.updateOne(
       { email },
-      {
-        $set: {
-          isVerified: true,
-        },
-      }
+      { $set: { isVerified: true } }
     );
 
-    return res.redirect("https://withurdoctor.vercel.app/Login");
+    return res.redirect(`${FRONTEND_URL}/Login`);
   } catch (error) {
-    console.error("Verification failed:", error);
-    return res.status(500).send("Verification Failed");
+    console.error('Verification failed:', error);
+    return res.send('Verification Failed');
   }
 };
 
-module.exports = {
-  onetimepass,
-  verifyOTP,
-};
+module.exports = { onetimepass, verifyOTP };
