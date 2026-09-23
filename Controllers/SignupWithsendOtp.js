@@ -1,11 +1,11 @@
-const DrInfoData = require("../model/DrLoginInfo");
+﻿const DrInfoData = require("../model/DrLoginInfo");
 const { sendEmail } = require("../utils/Mailer");
 
 const User_Name = process.env.EMAIL;
+const emailVerificationEnabled = Boolean(process.env.RESEND_API_KEY && process.env.EMAIL);
 
 const SERVER_PORT = process.env.PORT || 3500;
 
-// Production URL
 const SERVER_HOST =
   process.env.SERVER_HOST || "https://withurdoctor.onrender.com";
 
@@ -18,6 +18,27 @@ const onetimepass = async (req, res) => {
     if (!email) {
       return res.status(400).json({
         message: "Email is required",
+      });
+    }
+
+    if (!emailVerificationEnabled) {
+      console.warn(
+        "Email verification is disabled because RESEND_API_KEY or EMAIL is not configured."
+      );
+
+      await DrInfoData.updateOne(
+        { email },
+        {
+          $set: {
+            isVerified: true,
+          },
+        }
+      );
+
+      return res.status(200).json({
+        success: true,
+        message: "Account created successfully. Email verification is disabled on this server.",
+        emailVerificationEnabled: false,
       });
     }
 
@@ -43,8 +64,8 @@ const onetimepass = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Verification link sent successfully",
+      emailVerificationEnabled: true,
     });
-
   } catch (error) {
     console.error("========== EMAIL ERROR ==========");
     console.error("Code:", error.code);
@@ -59,7 +80,6 @@ const onetimepass = async (req, res) => {
   }
 };
 
-
 const verifyOTP = async (req, res) => {
   try {
     const { email } = req.query;
@@ -73,17 +93,12 @@ const verifyOTP = async (req, res) => {
       }
     );
 
-    return res.redirect(
-      "https://withurdoctor.vercel.app/Login"
-    );
-
+    return res.redirect("https://withurdoctor.vercel.app/Login");
   } catch (error) {
     console.error("Verification failed:", error);
-
     return res.status(500).send("Verification Failed");
   }
 };
-
 
 module.exports = {
   onetimepass,

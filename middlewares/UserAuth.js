@@ -1,5 +1,7 @@
     const drData= require("../model/DrLoginInfo");
 
+    const emailVerificationEnabled = Boolean(process.env.RESEND_API_KEY && process.env.EMAIL);
+
     const UserDataContoller= async (req,res,next) =>{
        try {
         const { 
@@ -23,7 +25,10 @@
                 message:"This email address already exists in your account."
             });
         }
-        const user = new drData(req.body);
+        const user = new drData({
+            ...req.body,
+            isVerified: !emailVerificationEnabled,
+        });
         await user.save();
         console.log(req.body);
             next()

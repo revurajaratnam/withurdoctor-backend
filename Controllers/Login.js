@@ -1,6 +1,8 @@
 const DrInfoData = require("../model/DrLoginInfo");
 const jwt = require('jsonwebtoken')
 
+const emailVerificationEnabled = Boolean(process.env.RESEND_API_KEY && process.env.EMAIL);
+
 const LoginInfo = async (req, res) => {
   try {
     const { email, pass  } = req.body;
@@ -15,7 +17,7 @@ const LoginInfo = async (req, res) => {
       });
     }
 
-    if (!user.isVerified) {
+    if (!user.isVerified && emailVerificationEnabled) {
       return res.json({
         success: false,
         message: "Your email verification is still pending. Please verify your email first.",
