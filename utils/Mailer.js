@@ -1,35 +1,28 @@
-const { Resend } = require("resend");
-                  require("dotenv").config();
-const apiKey = process.env.RESEND_API_KEY;
+const nodemailer = require('nodemailer');
+require('dotenv').config();
 
-let transporter = null;
+const User_Name =
+  process.env.User_Name ||
+  process.env.USER_NAME ||
+  process.env.EMAIL ||
+  process.env.GMAIL_USER;
 
-if (apiKey) {
-  transporter = new Resend(apiKey);
-} else {
-  console.warn(
-    "RESEND_API_KEY is not configured. Email sending is disabled until a valid key is added to the environment."
-  );
-}
+const User_Pass =
+  process.env.User_Pass ||
+  process.env.USER_PASS ||
+  process.env.EMAIL_PASSWORD ||
+  process.env.GMAIL_APP_PASSWORD ||
+  process.env.EMAIL_PASS ||
+  process.env.APP_PASSWORD;
 
-const sendEmail = async ({ from, to, subject, html }) => {
-  if (!transporter) {
-    const error = new Error(
-      "RESEND_API_KEY is missing. Add RESEND_API_KEY to your .env file to enable email sending."
-    );
-    error.code = "RESEND_API_KEY_MISSING";
-    throw error;
-  }
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST || 'smtp.gmail.com',
+  port: Number(process.env.SMTP_PORT || 587),
+  secure: String(process.env.SMTP_SECURE || 'false') === 'true',
+  auth: {
+    user: User_Name,
+    pass: User_Pass,
+  },
+});
 
-  return transporter.emails.send({
-    from,
-    to,
-    subject,
-    html,
-  });
-};
-
-module.exports = {
-  transporter,
-  sendEmail,
-};
+module.exports = transporter;
