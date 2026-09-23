@@ -16,15 +16,21 @@ const mongoose  = require('mongoose');
                 required:true,
                 maxlength:[15],
             },
+            role:{
+                type:String,
+                required:true,
+                enum:["doctor","patinet","admin"],
+                default:"patient",
+            },
             isVerified:{
                 type:Boolean,
                 default:false
             },
-            expireAt:{
-                type:Date,
-                default:new Date(Date.now() + 10*60*100),
-                expires:0,
-            }
+            // expireAt:{
+            //     type:Date,
+            //     default:new Date(Date.now() + 10*60*100),
+            //     expires:0,
+            // }
     });
 
     const DrInfoData = mongoose.model("DrData",DrInfo);

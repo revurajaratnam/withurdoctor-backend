@@ -4,9 +4,9 @@ WithUrDoctor Backend is a Node.js and Express API for a doctor consultation plat
 
 ## Features
 
-- Doctor signup
-- Email verification
-- Doctor login with JWT
+- Doctor Signup
+- Email Verification
+- Doctor Login with JWT
 - Protected dashboard
 - Doctor profile data
 - Profile photo upload

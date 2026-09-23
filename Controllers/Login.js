@@ -5,10 +5,10 @@ const emailVerificationEnabled = Boolean(process.env.RESEND_API_KEY && process.e
 
 const LoginInfo = async (req, res) => {
   try {
-    const { email, pass } = req.body;
+    const { email, pass  } = req.body;
+    console.log(req.body);
 
-
-    const user = await DrInfoData.findOne({ email });
+    const user = await DrInfoData.findOne({ email:email.trim() });
 
     if (!user) {
       return res.json({
@@ -30,16 +30,17 @@ const LoginInfo = async (req, res) => {
         message: "Invalid password",
       });
     }
-    const token = jwt.sign({id:user._id, email:user.email,role:"doctor" }, process.env.JWT_SECRET, { expiresIn: "1h" });  
+    const token = jwt.sign({id:user._id, email:user.email,name:user.fullname ,role:user.role}, process.env.JWT_SECRET, { expiresIn: "12h" });  
     return res.json({
       success: true,
       message: "Login Successful",
       token,
       user:{
+        _id : user._id,
+        name:user.fullname,
         email:user.email,
-        role: "doctor",
+        role: user.role,
       }
-      
     });
     console.log(token);
   } catch (err) {
