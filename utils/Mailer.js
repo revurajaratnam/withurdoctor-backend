@@ -1,5 +1,5 @@
 const { Resend } = require("resend");
-
+                  require("dotenv").config();
 const apiKey = process.env.RESEND_API_KEY;
 
 let transporter = null;
