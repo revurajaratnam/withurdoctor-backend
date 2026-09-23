@@ -19,7 +19,7 @@ const mongoose  = require('mongoose');
             role:{
                 type:String,
                 required:true,
-                enum:["doctor","patinet","admin"],
+                enum:["doctor","patient","admin"],
                 default:"patient",
             },
             isVerified:{
